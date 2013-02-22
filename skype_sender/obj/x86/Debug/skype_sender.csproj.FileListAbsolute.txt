@@ -1,0 +1,15 @@
+c:\users\user\documents\visual studio 2010\Projects\skype_sender\skype_sender\obj\x86\Debug\ResolveAssemblyReference.cache
+c:\users\user\documents\visual studio 2010\Projects\skype_sender\skype_sender\obj\x86\Debug\Interop.SKYPE4COMLib.dll
+c:\users\user\documents\visual studio 2010\Projects\skype_sender\skype_sender\obj\x86\Debug\skype_sender.csproj.ResolveComReference.cache
+c:\users\user\documents\visual studio 2010\Projects\skype_sender\skype_sender\obj\x86\Debug\skype_sender.Form1.resources
+c:\users\user\documents\visual studio 2010\Projects\skype_sender\skype_sender\obj\x86\Debug\skype_sender.Properties.Resources.resources
+c:\users\user\documents\visual studio 2010\Projects\skype_sender\skype_sender\obj\x86\Debug\GenerateResource-ResGen.read.1.tlog
+c:\users\user\documents\visual studio 2010\Projects\skype_sender\skype_sender\obj\x86\Debug\GenerateResource-ResGen.write.1.tlog
+c:\users\user\documents\visual studio 2010\Projects\skype_sender\skype_sender\bin\Debug\Skype4COM.dll
+c:\users\user\documents\visual studio 2010\Projects\skype_sender\skype_sender\bin\Debug\Interop.SKYPE4COMLib.dll
+C:\Users\User\documents\visual studio 2010\Projects\skype_sender\skype_sender\bin\Debug\Скайп-отправляльщик.exe
+C:\Users\User\documents\visual studio 2010\Projects\skype_sender\skype_sender\bin\Debug\Скайп-отправляльщик.pdb
+C:\Users\User\documents\visual studio 2010\Projects\skype_sender\skype_sender\obj\x86\Debug\Скайп-отправляльщик.exe
+C:\Users\User\documents\visual studio 2010\Projects\skype_sender\skype_sender\obj\x86\Debug\Скайп-отправляльщик.pdb
+C:\Users\User\Documents\Visual Studio 2010\Projects\skype_sender\skype_sender\obj\x86\Debug\skype_sender.Form2.resources
+C:\Users\User\Documents\Visual Studio 2010\Projects\skype_sender\skype_sender\bin\Debug\Скайп-отправляльщик.exe.config
