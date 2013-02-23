@@ -24,6 +24,7 @@ using System.Collections;
         private Boolean continueSend = false;
         private  _ISkypeEvents_MessageStatusEventHandler handler;
         private List<int> answered = new List<int>();
+        private List<String> answeredStr = new List<String>();
 
         public Form1()
         {
@@ -38,7 +39,9 @@ using System.Collections;
                 AsyncOperation ao = AsyncOperationManager.CreateOperation(skype);
                 new AsyncOperationInvoker(initLaunch).BeginInvoke(ao, null, null);
                 label1.BackColor = Color.PeachPuff;
-                handler = new _ISkypeEvents_MessageStatusEventHandler(messageHandler);
+                //handler = new _ISkypeEvents_MessageStatusEventHandler(messageHandler);
+                ((_ISkypeEvents_Event)skype).MessageStatus += messageHandler;
+                ((_ISkypeEvents_Event)skype).AttachmentStatus += OurAttachmentStatus;
             }
             catch
             {
@@ -71,16 +74,13 @@ using System.Collections;
                 button1.Text = "Отправить";
                 continueSend = false;
             }
-            
-            
-            
             linkLabel1.Visible = true;
 
         }
 
         
 
-        // метод выполняется в рабочем потоке
+        // initialization
         private void initLaunch(AsyncOperation operation)
         {
             // в теле этого метода можно обращаться к любому контролу в UI.
@@ -89,17 +89,16 @@ using System.Collections;
                 waiting.Text = (String)state;
             };
             try
-            {
-                Skype s = (Skype)operation.UserSuppliedState;                
-                if (!s.Client.IsRunning)
+            {               
+                if (!skype.Client.IsRunning)
                 {
-                    s.Client.Start(true, true);
+                    skype.Client.Start(true, true);
                     operation.Post(callback, "Запускаем скайп...");
-                    Thread.Sleep(4000);
+                    //Thread.Sleep(4000);
                 }
-                // Use skype protocol version 7 
-                s.Attach(7, true);
-                SKYPE4COMLib.UserCollection users = s.Friends;
+                // Use skype protocol version 9 
+                skype.Attach(9, true);
+                SKYPE4COMLib.UserCollection users = skype.Friends;
                 int total = users.Count;
                 int online = 0;
                 foreach (SKYPE4COMLib.User user in users)
@@ -110,14 +109,11 @@ using System.Collections;
                     }
                 }
                 operation.Post(callback, "Контактов " + total + ", в сети - " + online);
-
-                
             }
             catch 
             {
                 MessageBox.Show("Блиин, что-то пошло не так, попробуй перезапустить программу.", "Ошибка однако", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-            
+            }            
         }
 
         private void send(AsyncOperation operation)
@@ -133,8 +129,7 @@ using System.Collections;
                 output.Text = String.Concat("Послано " , (int)state);
             };
 
-            Skype s = (Skype)operation.UserSuppliedState;
-            SKYPE4COMLib.UserCollection users = s.Friends;
+            SKYPE4COMLib.UserCollection users = skype.Friends;
             List<SKYPE4COMLib.User> friends = new List<SKYPE4COMLib.User>();
             IEnumerator en = users.GetEnumerator();
             while (en.MoveNext())
@@ -153,13 +148,13 @@ using System.Collections;
                 {
                     if (user.OnlineStatus != TOnlineStatus.olsOffline)
                     {
-                        s.SendMessage(user.Handle, message);
+                        skype.SendMessage(user.Handle, message);
                         sentTo += user.Handle + " (" + user.FullName + ")\n";
                     }
                 }
                 else
                 {
-                    s.SendMessage(user.Handle, message);
+                    skype.SendMessage(user.Handle, message);
                     sentTo += user.Handle + " (" + user.FullName + ")\n";
                 }
                 count += 1;
@@ -192,9 +187,7 @@ using System.Collections;
                 label1.Text = "Автоответчик включен";
                 label1.BackColor = Color.GreenYellow;
                 button2.Text = "Отключить";
-                autorespond = true;
-                answered = new List<int>();
-                skype.MessageStatus += handler;
+                autorespond = true;                
             }
             else
             {
@@ -202,7 +195,6 @@ using System.Collections;
                 label1.BackColor = Color.PeachPuff;
                 button2.Text = "Включить";
                 autorespond = false;
-                skype.MessageStatus -= handler;
             }
         }
 
@@ -210,15 +202,57 @@ using System.Collections;
 
         private void messageHandler(ChatMessage msg, TChatMessageStatus status)
         {
-            if (answered.Contains(msg.Id))
+            if (answered.Contains(msg.Id) 
+                || answeredStr.Contains(msg.Sender.Handle+":"+msg.Body)
+                || (DateTime.Now - msg.Timestamp)>TimeSpan.FromMinutes(1) )
             {
                 return;
             }
             if (autorespond)
+            {
+                skype.SendMessage(msg.Sender.Handle, richTextBox2.Text);
+                answered.Add(msg.Id);
+                answeredStr.Add(msg.Sender.Handle + ":" + msg.Body);
+            }
+        }
+
+        public void OurAttachmentStatus(TAttachmentStatus status)
+        {
+            try
+            {
+                if (status == TAttachmentStatus.apiAttachAvailable)
                 {
-                    skype.SendMessage(msg.Sender.Handle, richTextBox2.Text);
-                    answered.Add(msg.Id);
+                    skype.Attach(9, false);
                 }
+                if (status == TAttachmentStatus.apiAttachSuccess)
+                {
+                    AsyncOperation ao = AsyncOperationManager.CreateOperation(skype);
+                    new AsyncOperationInvoker(wakeUpSkype).BeginInvoke(ao, null, null);
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        private void wakeUpSkype(AsyncOperation operation)
+        {
+            try
+            {
+                while (true)
+                {
+                    if (true)
+                    {
+                        skype.SendMessage("echo123", "Скайп, не спи... Не упускай мои сообщения... " + DateTime.Now);
+                        //skype.Attach(9, false);
+                        Thread.Sleep(60000);
+                    }
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Блиин, что-то пошло не так, попробуй перезапустить программу.", "Ошибка однако", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
         }
 
     }
